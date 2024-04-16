@@ -5,16 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PharmSchecule"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="480">
-    <StackPanel>
-        <TextBlock Text="西元年"/>
-        <TextBox x:Name="txb_year"/>
-        <TextBlock Text="月"/>
-        <TextBox x:Name="txb_month"/>
-        <TextBlock Text="人員A"/>
-        <TextBox x:Name="txb_A"/>
-        <TextBlock Text="人員B"/>
-        <TextBox x:Name="txb_B"/>
+        Title="MainWindow" Height="auto" Width="480">
+    <StackPanel Margin="5">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="西元年"/>
+            <TextBox Width="50" Margin="5,0" x:Name="txb_year"/>
+            <TextBlock Text="月"/>
+            <TextBox Width="50" Margin="5,0" x:Name="txb_month"/>
+            <TextBlock Text="人員A"/>
+            <TextBox Width="50" Margin="5,0" x:Name="txb_A"/>
+            <TextBlock Text="人員B"/>
+            <TextBox Width="50" Margin="5,0" x:Name="txb_B"/>
+        </StackPanel>
         <TextBlock Text="休假日(以逗號分隔)"/>
         <TextBox x:Name="txb_off"/>
         <TextBlock Text="A 指定休假(以逗號分隔, Ex. 1-1: 代表1號早班)"/>
@@ -22,6 +24,7 @@
         <TextBlock Text="B 指定休假(以逗號分隔, Ex. 1-1: 代表1號早班)"/>
         <TextBox x:Name="txb_Boff"/>
         <Button Content="產生" Click="Button_Click"/>
-        <TextBox x:Name="rtb"/>
+        <TextBox Height="450" x:Name="rtb"/>
+        <Button Content="複製結果" Click="Button_Click_1"/>
     </StackPanel>
 </Window>

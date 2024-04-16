@@ -178,11 +178,7 @@ namespace PharmSchecule
                         }
                         else
                         {
-                            var (a, b) = GetRandom();
-                            dayInfo.MorningShift = a;
-                            dayInfo.AfternoonShift = a;
-                            (a, b) = GetRandom();
-                            dayInfo.NightShift = a;
+                            AllRandom(dayInfo);
                         }
                     }    
                     else if (idx == 5) // 週六
@@ -231,13 +227,26 @@ namespace PharmSchecule
                     }
                     else
                     {
-                        var (a, b) = GetRandom();
-                        dayInfo.MorningShift = a;
-                        dayInfo.AfternoonShift = a;
-                        (a, b) = GetRandom();
-                        dayInfo.NightShift = a;
+                        AllRandom(dayInfo);
                     }
                 }
+            }
+        }
+
+        private void AllRandom(DayInfo dayInfo)
+        {
+            var (a, b) = GetRandom();
+            dayInfo.MorningShift = a;
+            (a, b) = GetRandom();
+            dayInfo.AfternoonShift = a;
+            if (dayInfo.MorningShift != dayInfo.AfternoonShift)
+            {
+                dayInfo.NightShift = dayInfo.AfternoonShift;
+            }
+            else
+            {
+                (a, b) = GetRandom();
+                dayInfo.NightShift = a;
             }
         }
 
@@ -283,11 +292,37 @@ namespace PharmSchecule
 
             try
             {
-                _offDays = txb_off.Text.Split(',').Select(c => Convert.ToInt32(c)).ToList();
+                if (string.IsNullOrWhiteSpace(txb_off.Text) == false)
+                {
+                    _offDays = txb_off.Text.Split(',').Select(c => Convert.ToInt32(c)).ToList();
+                }
             }
-            catch { }
+            catch 
+            {
+                MessageBox.Show("休假日 格式錯誤");
+                return;
+            }
 
-            SetDays(Convert.ToInt32(txb_year.Text), Convert.ToInt32(txb_month.Text));
+            try
+            {
+                SetDays(Convert.ToInt32(txb_year.Text), Convert.ToInt32(txb_month.Text));
+            }
+            catch
+            {
+                MessageBox.Show("年 或 月 格式錯誤");
+                return;
+            }
+
+            try
+            {
+                SetEmployeeOff(_employees[0], txb_Aoff.Text);
+                SetEmployeeOff(_employees[1], txb_Boff.Text);
+            }
+            catch
+            {
+                MessageBox.Show("人員休假日A 或 B 格式錯誤");
+                return;
+            }
 
             StartScheduling();
             var (sumA, sumB) = StatisticsShift();
@@ -368,6 +403,57 @@ namespace PharmSchecule
             }
 
             rtb.Text = result;
+        }
+
+        private void SetEmployeeOff(string name, string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return;
+            }
+            var tokens = content.Split(",");
+            foreach (var token in tokens)
+            {
+                var rlt = token.Split("-");
+                var offDay = Convert.ToInt32(rlt[0]);
+                var offShift = Convert.ToInt32(rlt[1]);
+                foreach (var week in _days)
+                {
+                    foreach (var day in week)
+                    {
+                        if (day == null)
+                        {
+                            continue;
+                        }
+                        if (day.Day == offDay)
+                        {
+                            if (offShift == 1)
+                            {
+                                day.MorningShift = GetOtherEmployee(name);
+                            }
+                            else if (offShift == 2)
+                            {
+                                day.AfternoonShift = GetOtherEmployee(name);
+                            }
+                            else if (offShift == 3)
+                            {
+                                day.NightShift = GetOtherEmployee(name);
+                            }
+                            else
+                            {
+                                throw new Exception();
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(rtb.Text);
+            MessageBox.Show("複製成功");
         }
     }
 
